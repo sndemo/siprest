@@ -23,7 +23,7 @@ user = 'siprest'
 pwd = 'hunter2'
 
 local_host = 'siprest'
-local_ip = socket.gethostbyname(local_host)
+local_ip = '127.0.0.1'
 
 @routes.get('/')
 async def home(request):
