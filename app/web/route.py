@@ -3,6 +3,7 @@ import random
 import asyncio
 import aiosip
 import contextlib
+import socket
 
 from aiohttp import web
 from web.config import config 
@@ -12,6 +13,7 @@ routes = web.RouteTableDef()
 
 proxy_host = 'sipproxy'
 proxy_port = 6100
+proxy_ip = socket.gethostbyname(proxy_host)
 
 uas_host = 'sipuas'
 uas_port = 6200
@@ -21,6 +23,7 @@ user = 'siprest'
 pwd = 'hunter2'
 
 local_host = 'siprest'
+local_ip = socket.gethostbyname(local_host)
 
 @routes.get('/')
 async def home(request):
@@ -33,9 +36,9 @@ async def register(request):
   from_user = request.match_info['from_user']
 
   sip = aiosip.Application(loop=request.loop)
- 
+
   local_port = random.randint(6001, 6999)
-  peer = await sip.connect((proxy_host, proxy_port), protocol=aiosip.TCP, local_addr=(local_host, local_port))
+  peer = await sip.connect((proxy_ip, proxy_port), protocol=aiosip.TCP, local_addr=(local_ip, local_port))
   
   from_details = header(from_user,uas_host, uas_port)
   to_details=header(from_user, uas_host, uas_port)
@@ -55,7 +58,7 @@ async def invite(request):
   sip = aiosip.Application(loop=request.loop)
   
   local_port = random.randint(7001, 7999)
-  peer = await sip.connect((proxy_host, proxy_port), protocol=aiosip.TCP, local_addr=(local_host, local_port))
+  peer = await sip.connect((proxy_ip, proxy_port), protocol=aiosip.TCP, local_addr=(local_ip, local_port))
   
   call = await peer.invite(
                from_details=header(user, local_host, local_port), 
